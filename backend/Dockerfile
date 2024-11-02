@@ -12,11 +12,12 @@ RUN npm run build
 FROM build AS test
 
 WORKDIR /app
-COPY --from=build /app/src ./src
+
+COPY --from=build /app/dist ./dist
 COPY tsconfig.json ./tsconfig.json
 COPY jest.config.js ./jest.config.js
 
-CMD ["npm", "run", "test"]
+CMD ["npm", "run", "test", "dist"]
 
 FROM node:20.12-alpine AS run
 
