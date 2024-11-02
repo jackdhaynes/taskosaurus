@@ -16,4 +16,4 @@ jobs:
         run: docker build --target test -t $IMAGE_NAME:test .
         working-directory: backend
       - name: Run tests
-        run: docker run --rm $IMAGE_NAME:test
+        run: docker run --rm -t $IMAGE_NAME:test
