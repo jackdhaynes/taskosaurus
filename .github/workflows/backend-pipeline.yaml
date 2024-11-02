@@ -16,6 +16,4 @@ jobs:
         run: docker build --target test -t $IMAGE_NAME:test .
         working-directory: backend
       - name: Run tests
-        run: docker run --rm $IMAGE_NAME:test
-        env:
-          FORCE_COLOR: true
+        run: docker run --rm -e FORCE_COLOR=true $IMAGE_NAME:test
