@@ -1,0 +1,20 @@
+name: Backend CI/CD pipeline
+
+on: push
+
+env:
+  IMAGE_NAME: taskosaurus-backend
+
+jobs:
+  run-tests:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup image builder
+        uses: docker/setup-buildx-action@v3.7.1
+      - name: Build image
+        run: docker build --target test -t $IMAGE_NAME:test .
+      - name: Run tests
+        run: docker run --rm $IMAGE_NAME:test
