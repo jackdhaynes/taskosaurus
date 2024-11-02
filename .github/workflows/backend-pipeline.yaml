@@ -18,4 +18,4 @@ jobs:
       - name: Run tests
         run: docker run --rm $IMAGE_NAME:test
         env:
-          FORCE_COLOR: 1
+          FORCE_COLOR: true
