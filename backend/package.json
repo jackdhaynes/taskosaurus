@@ -7,7 +7,8 @@
     "start": "node dist/index.js",
     "dev": "nodemon -r tsconfig-paths/register -r dotenv/config src/index.ts",
     "test": "jest",
-    "create-dev-token": "nodemon -r tsconfig-paths/register -r dotenv/config src/scripts/createDevToken.ts"
+    "db-seed": "npx prisma db seed",
+    "db-reset": "npx prisma db push --force-reset"
   },
   "author": "",
   "license": "ISC",
@@ -31,5 +32,8 @@
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.3"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   }
 }

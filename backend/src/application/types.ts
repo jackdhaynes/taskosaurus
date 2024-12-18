@@ -10,3 +10,7 @@ export type NewTask = {
 export type Task = NewTask & {
   id: number;
 };
+
+export type UserContext = {
+  userId: number;
+};

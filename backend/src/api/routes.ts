@@ -6,6 +6,7 @@ import {
 } from "./controllers/addNewTask";
 import { healthController } from "./controllers/health";
 import { authenticateRequest } from "./middleware/authentication";
+import { getUserTasksController } from "./controllers/getUserTasks";
 
 const router = express.Router();
 
@@ -15,8 +16,16 @@ router.get("/health", healthController);
 router.post(
   "/tasks",
   validateRequest(addNewTaskRequestSchema),
-  authenticateRequest(),
+  authenticateRequest,
+  // @ts-ignore
   addNewTaskController
+);
+
+router.get(
+  "/tasks",
+  authenticateRequest,
+  // @ts-ignore
+  getUserTasksController
 );
 
 export default router;

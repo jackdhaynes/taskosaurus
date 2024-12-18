@@ -4,10 +4,8 @@ import jwt, { JwtHeader } from "jsonwebtoken";
 import { z } from "zod";
 import config from "@/config";
 
-const DEV_USER_ID = "db22f766-5b91-4ffd-868d-2d1c5169ce8b";
-
 export interface AuthenticatedRequest extends Request {
-  userId: string;
+  internalUserId: number;
 }
 
 const accessTokenSchema = z.object({
@@ -38,32 +36,32 @@ const getRequestToken = (request: Request): string => {
   return request.headers.authorization?.split(" ")[1]!;
 };
 
-export const authenticateRequest = (): RequestHandler => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    if (config.USE_DEV_TOKEN) {
-      (req as AuthenticatedRequest).userId = DEV_USER_ID;
-      next();
+export const authenticateRequest = (
+  request: Request,
+  response: Response,
+  next: NextFunction
+): void => {
+  if (config.USE_DEV_AUTH) {
+    (request as AuthenticatedRequest).internalUserId = config.DEV_USER_ID;
+    return next();
+  }
+
+  const token = getRequestToken(request);
+
+  if (!token) {
+    response.status(403).json({ error: "Must provide authorization token" });
+    return;
+  }
+
+  jwt.verify(token, getKey, { algorithms: ["RS256"] }, (err, decoded) => {
+    if (err) {
+      response.status(401).json({ message: "Not authorized" });
       return;
     }
 
-    const token = getRequestToken(req);
+    const payload = accessTokenSchema.parse(decoded);
+    (request as AuthenticatedRequest).internalUserId = 1;
 
-    if (!token) {
-      res.status(403).send({ message: "Must provide token" });
-      return;
-    }
-
-    jwt.verify(token, getKey, { algorithms: ["RS256"] }, (err, decoded) => {
-      if (err) {
-        res.status(401).send({ message: "Not authorized" });
-        return;
-      }
-
-      const payload = accessTokenSchema.parse(decoded);
-      (req as AuthenticatedRequest).userId = payload.username;
-
-      next();
-      return;
-    });
-  };
+    return next();
+  });
 };
