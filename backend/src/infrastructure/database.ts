@@ -15,3 +15,19 @@ export const getUserTasks = async (userId: number): Promise<Task[]> => {
     },
   });
 };
+
+class TaskNotFoundError extends Error {}
+
+export const getTask = async (taskId: number): Promise<Task> => {
+  const task = await prisma.task.findUnique({
+    where: {
+      id: taskId,
+    },
+  });
+
+  if (!task) {
+    throw new TaskNotFoundError("Task not found");
+  }
+
+  return task;
+};
