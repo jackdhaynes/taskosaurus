@@ -8,6 +8,7 @@ import { healthController } from "./controllers/health";
 import { authenticateRequest } from "./middleware/authentication";
 import { getUserTasksController } from "./controllers/getUserTasks";
 import { getTaskController, getTaskRequestSchema } from "./controllers/getTask";
+import { errorHandler } from "./middleware/errorHandler";
 
 const router = express.Router();
 
@@ -36,5 +37,7 @@ router.get(
   // @ts-ignore
   getTaskController
 );
+
+// router.use(errorHandler);
 
 export default router;

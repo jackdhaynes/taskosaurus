@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { NextFunction, Response } from "express";
 import { AuthenticatedRequest } from "../middleware/authentication";
 import { getUserTasksInteractor } from "@/application/interactors/getUserTasks";
 import { z } from "zod";
@@ -21,7 +21,8 @@ type GetTaskRequest = ValidatedRequest<typeof getTaskRequestSchema> &
 
 export const getTaskController = async (
   request: GetTaskRequest,
-  response: Response
+  response: Response,
+  next: NextFunction
 ) => {
   try {
     var task = await getTaskInteractor(
@@ -32,7 +33,7 @@ export const getTaskController = async (
     if (error instanceof TaskNotFoundError) {
       return response.status(204).send();
     }
-    throw error;
+    return next(error);
   }
 
   return response.status(200).json({
