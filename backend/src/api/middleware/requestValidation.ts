@@ -24,18 +24,22 @@ export const validateRequest = <TParams, TQuery, TBody>(
   schema: RequestSchema<TParams, TQuery, TBody>
 ): RequestHandler<TParams, any, TBody, TQuery> => {
   return (req, res, next) => {
-    if (schema.params) {
-      req.params = schema.params.parse(req.params);
-    }
+    try {
+      if (schema.params) {
+        req.params = schema.params.parse(req.params);
+      }
 
-    if (schema.query) {
-      req.query = schema.query.parse(req.query);
-    }
+      if (schema.query) {
+        req.query = schema.query.parse(req.query);
+      }
 
-    if (schema.body) {
-      req.body = schema.body.parse(req.body);
-    }
+      if (schema.body) {
+        req.body = schema.body.parse(req.body);
 
-    return next();
+        return next();
+      }
+    } catch (e) {
+      res.status(400).send({ message: "Invalid input", details: e });
+    }
   };
 };

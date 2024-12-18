@@ -1,11 +1,12 @@
-import express, { Express, Request, Response } from "express";
+import express, { Express } from "express";
+import router from "./routes";
+import { env } from "process";
 
-export const createApp = (port: number): Express => {
-  const app: Express = express();
+export const createServer = (port: number): Express => {
+  const server: Express = express();
 
-  app.get("/", (req: Request, res: Response) => {
-    res.send("Hello world!");
-  });
+  server.use(express.json());
+  server.use("/", router);
 
-  return app;
+  return server;
 };
