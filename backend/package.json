@@ -8,7 +8,8 @@
     "dev": "nodemon -r tsconfig-paths/register -r dotenv/config src/index.ts",
     "test": "jest",
     "db-seed": "npx prisma db seed",
-    "db-reset": "npx prisma db push --force-reset"
+    "db-reset": "npx prisma db push --force-reset",
+    "create-dev-jwt": "ts-node scripts/createDevJwt.ts"
   },
   "author": "",
   "license": "ISC",
