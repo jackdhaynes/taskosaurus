@@ -3,9 +3,10 @@ import jwksClient, { SigningKey } from "jwks-rsa";
 import jwt, { JwtHeader } from "jsonwebtoken";
 import { z } from "zod";
 import config from "@/config";
+import { UserIdentity } from "@/application/types";
 
 export interface AuthenticatedRequest extends Request {
-  internalUserId: number;
+  userIdentity: UserIdentity;
 }
 
 const accessTokenSchema = z.object({
@@ -42,7 +43,10 @@ export const authenticateRequest = (
   next: NextFunction
 ): void => {
   if (config.USE_DEV_AUTH) {
-    (request as AuthenticatedRequest).internalUserId = config.DEV_USER_ID;
+    (request as AuthenticatedRequest).userIdentity = {
+      userId: config.DEV_USER_ID,
+    };
+
     return next();
   }
 
@@ -60,7 +64,9 @@ export const authenticateRequest = (
     }
 
     const payload = accessTokenSchema.parse(decoded);
-    (request as AuthenticatedRequest).internalUserId = 1;
+    (request as AuthenticatedRequest).userIdentity = {
+      userId: config.DEV_USER_ID,
+    };
 
     return next();
   });

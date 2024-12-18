@@ -11,6 +11,6 @@ export type Task = NewTask & {
   id: number;
 };
 
-export type UserContext = {
+export type UserIdentity = {
   userId: number;
 };

@@ -38,8 +38,8 @@ export const validateRequest = <TParams, TQuery, TBody>(
 
         return next();
       }
-    } catch (e) {
-      res.status(400).send({ message: "Invalid input", details: e });
+    } catch (error) {
+      res.status(400).send({ message: "Invalid input", details: error });
     }
   };
 };

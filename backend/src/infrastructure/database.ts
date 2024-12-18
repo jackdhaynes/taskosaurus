@@ -1,3 +1,4 @@
+import { TaskNotFoundError } from "@/application/interactors/getTask";
 import { NewTask, Task } from "@/application/types";
 import { PrismaClient } from "@prisma/client";
 
@@ -15,8 +16,6 @@ export const getUserTasks = async (userId: number): Promise<Task[]> => {
     },
   });
 };
-
-class TaskNotFoundError extends Error {}
 
 export const getTask = async (taskId: number): Promise<Task> => {
   const task = await prisma.task.findUnique({
