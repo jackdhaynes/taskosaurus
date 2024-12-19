@@ -1,6 +1,5 @@
 import { NextFunction, Response } from "express";
 import { AuthenticatedRequest } from "../middleware/authentication";
-import { getUserTasksInteractor } from "@/application/interactors/getUserTasks";
 import { z } from "zod";
 import { ValidatedRequest } from "../middleware/requestValidation";
 import {

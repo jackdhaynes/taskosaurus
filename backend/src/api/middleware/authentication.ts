@@ -4,13 +4,20 @@ import jwt, { JwtHeader } from "jsonwebtoken";
 import { z } from "zod";
 import config from "@/config";
 import { UserIdentity } from "@/application/types";
+import path from "path";
+import { promisify } from "util";
+import { readFile } from "fs";
+
+const DEV_KEY_PATH = "../../../../.token/.public-key";
+
+let cachedPublicKey: string;
 
 export interface AuthenticatedRequest extends Request {
   userIdentity: UserIdentity;
 }
 
 const accessTokenSchema = z.object({
-  username: z.string(),
+  username: z.coerce.string(),
 });
 
 const client = jwksClient({
@@ -19,7 +26,7 @@ const client = jwksClient({
 
 type GetKeyCallback = (err: Error | null, key?: string) => void;
 
-const getKey = (header: JwtHeader, callback: GetKeyCallback): void => {
+const getRemoteKey = (header: JwtHeader, callback: GetKeyCallback): void => {
   client.getSigningKey(
     header.kid || "",
     (err: Error | null, key?: SigningKey) => {
@@ -33,6 +40,20 @@ const getKey = (header: JwtHeader, callback: GetKeyCallback): void => {
   );
 };
 
+const getDevKey = async (
+  header: JwtHeader,
+  callback: GetKeyCallback
+): Promise<void> => {
+  if (!cachedPublicKey) {
+    const keyPath = path.resolve(__dirname, DEV_KEY_PATH);
+    const _readFile = promisify(readFile);
+
+    cachedPublicKey = await _readFile(keyPath, "utf-8");
+  }
+
+  callback(null, cachedPublicKey);
+};
+
 const getRequestToken = (request: Request): string => {
   return request.headers.authorization?.split(" ")[1]!;
 };
@@ -42,14 +63,6 @@ export const authenticateRequest = (
   response: Response,
   next: NextFunction
 ): void => {
-  if (config.USE_DEV_AUTH) {
-    (request as AuthenticatedRequest).userIdentity = {
-      userId: config.DEV_USER_ID,
-    };
-
-    return next();
-  }
-
   const token = getRequestToken(request);
 
   if (!token) {
@@ -57,7 +70,9 @@ export const authenticateRequest = (
     return;
   }
 
-  jwt.verify(token, getKey, { algorithms: ["RS256"] }, (err, decoded) => {
+  const publicKey = config.USE_DEV_TOKEN ? getDevKey : getRemoteKey;
+
+  jwt.verify(token, publicKey, { algorithms: ["RS256"] }, (err, decoded) => {
     if (err) {
       response.status(401).json({ message: "Not authorized" });
       return;

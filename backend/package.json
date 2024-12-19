@@ -9,7 +9,7 @@
     "test": "jest",
     "db-seed": "npx prisma db seed",
     "db-reset": "npx prisma db push --force-reset",
-    "create-dev-jwt": "ts-node scripts/createDevJwt.ts"
+    "create-dev-jwt": "ts-node -r tsconfig-paths/register scripts/createDevJwt.ts"
   },
   "author": "",
   "license": "ISC",
